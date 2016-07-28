@@ -63,7 +63,49 @@ func (d *S3Downstream) Put(data *DSData) (string, error) {
 }
 
 func (d *S3Downstream) Move(srcfile string, destfile string) (string, error) {
-	return "", errors.New("Not implemented yet")
+	
+	var err error
+	cachePath := filepath.Join(d.prefix, srcfile)
+	_, err = d.Info(cachePath)
+	if err != nil {
+		return "", errors.New("File does not exist")
+	}
+
+	cachePath = filepath.Join(d.bucket, cachePath)
+	destPath := filepath.Join(d.prefix, destfile)
+	params := &s3.CopyObjectInput{
+		Bucket:                         aws.String(d.bucket),  
+		CopySource:                     aws.String(cachePath),
+		Key:                            aws.String(destPath), 
+	}
+	_, err = d.s3svc.CopyObject(params)
+	if err != nil {
+		return "", errors.New("Copy file failed")
+	}
+
+	err = d.Delete(srcfile)
+	
+	if err != nil {
+		return "", err
+	}
+
+	return "", nil
+}
+
+func (d *S3Downstream) Delete(srcfile string) (error) {
+	cachePath := filepath.Join(d.prefix, srcfile)
+
+	params := &s3.DeleteObjectInput{
+		Bucket:       aws.String(d.bucket),
+		Key:          aws.String(cachePath),
+	}
+	_, err := d.s3svc.DeleteObject(params)
+	
+	if err != nil {
+		return errors.New("Delete file failed")
+	}
+	
+	return nil
 }
 
 func (d *S3Downstream) Info(path string) (string, error) {

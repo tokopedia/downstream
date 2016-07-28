@@ -41,3 +41,16 @@ func TestFileDownstream(t *testing.T) {
 	}
 	t.Log(path)
 }
+
+func TestMoveFileS3Downstream(t *testing.T) {
+	u, err := url.Parse("s3://tokopedia-upload")
+
+	ds := NewS3Downstream(u.Host, u.Path, "https://ecs7.tokopedia.net")
+	srcfile := "download2.jpg"
+	destfile := "download.jpg"
+
+	_, err = ds.Move(srcfile, destfile)
+	if err != nil {
+		t.Error(err)
+	}
+}
