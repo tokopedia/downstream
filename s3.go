@@ -57,7 +57,7 @@ func (d *S3Downstream) Put(data *DSData) (string, error) {
 		Body:        bytes.NewReader(data.Data),
 		ContentType: aws.String(data.MimeType),
 	}
-	res, err := d.client.Upload(upInput)
+	_, err := d.client.Upload(upInput)
 	return data.Path, err
 }
 
