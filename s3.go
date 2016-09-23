@@ -27,6 +27,7 @@ const (
 func NewS3Downstream(bucket string, path string, web string) *S3Downstream {
 	sess := session.New(&aws.Config{
 		Region: aws.String("ap-southeast-1"),
+    DisableSSL: aws.Bool(true),
 	})
 
 	svc := s3.New(sess)
