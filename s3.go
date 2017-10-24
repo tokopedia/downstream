@@ -2,6 +2,7 @@ package downstream
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -27,7 +28,7 @@ const (
 func NewS3Downstream(bucket string, path string, web string) *S3Downstream {
 	sess := session.New(&aws.Config{
 		Region: aws.String("ap-southeast-1"),
-    DisableSSL: aws.Bool(true),
+		//DisableSSL: aws.Bool(true),
 	})
 
 	svc := s3.New(sess)
@@ -58,13 +59,24 @@ func (d *S3Downstream) Put(data *DSData) (string, error) {
 		Body:        bytes.NewReader(data.Data),
 		ContentType: aws.String(data.MimeType),
 	}
-	res, err := d.client.Upload(upInput)
-	log.Println(res)
+	_, err := d.client.Upload(upInput)
+	return data.Path, err
+}
+
+func (d *S3Downstream) PutWithContext(ctx context.Context, data *DSData) (string, error) {
+	cachePath := filepath.Join(d.prefix, data.Path)
+	upInput := &s3manager.UploadInput{
+		Bucket:      aws.String(d.bucket),
+		Key:         aws.String(cachePath),
+		Body:        bytes.NewReader(data.Data),
+		ContentType: aws.String(data.MimeType),
+	}
+	_, err := d.client.UploadWithContext(ctx, upInput)
 	return data.Path, err
 }
 
 func (d *S3Downstream) Move(srcfile string, destfile string) (string, error) {
-	
+
 	var err error
 	cachePath := filepath.Join(d.prefix, srcfile)
 	_, err = d.Info(cachePath)
@@ -75,9 +87,9 @@ func (d *S3Downstream) Move(srcfile string, destfile string) (string, error) {
 	cachePath = filepath.Join(d.bucket, cachePath)
 	destPath := filepath.Join(d.prefix, destfile)
 	params := &s3.CopyObjectInput{
-		Bucket:                         aws.String(d.bucket),  
-		CopySource:                     aws.String(cachePath),
-		Key:                            aws.String(destPath), 
+		Bucket:     aws.String(d.bucket),
+		CopySource: aws.String(cachePath),
+		Key:        aws.String(destPath),
 	}
 	_, err = d.s3svc.CopyObject(params)
 	if err != nil {
@@ -85,7 +97,7 @@ func (d *S3Downstream) Move(srcfile string, destfile string) (string, error) {
 	}
 
 	err = d.Delete(srcfile)
-	
+
 	if err != nil {
 		return "", err
 	}
@@ -93,19 +105,19 @@ func (d *S3Downstream) Move(srcfile string, destfile string) (string, error) {
 	return "", nil
 }
 
-func (d *S3Downstream) Delete(srcfile string) (error) {
+func (d *S3Downstream) Delete(srcfile string) error {
 	cachePath := filepath.Join(d.prefix, srcfile)
 
 	params := &s3.DeleteObjectInput{
-		Bucket:       aws.String(d.bucket),
-		Key:          aws.String(cachePath),
+		Bucket: aws.String(d.bucket),
+		Key:    aws.String(cachePath),
 	}
 	_, err := d.s3svc.DeleteObject(params)
-	
+
 	if err != nil {
 		return errors.New("Delete file failed")
 	}
-	
+
 	return nil
 }
 

@@ -1,6 +1,7 @@
 package downstream
 
 import (
+	"context"
 	"log"
 	"net/url"
 	"os"
@@ -40,6 +41,35 @@ func (d *FileDownstream) Info(path string) (string, error) {
 }
 
 func (d *FileDownstream) Put(data *DSData) (string, error) {
+	cachePath := filepath.Join(d.URI, data.Path)
+
+	log.Println("using ", cachePath)
+
+	// existence check
+	_, err := os.Stat(cachePath)
+	if err == nil {
+		log.Println("file already exists, skipping ", cachePath)
+		return data.Path, nil
+	}
+
+	err = os.MkdirAll(path.Dir(cachePath), os.ModeDir|0777)
+	if err == nil {
+		out, err := os.Create(cachePath)
+		if err == nil {
+			out.Write(data.Data)
+			out.Close()
+			log.Println("cached into " + cachePath)
+		}
+	}
+	return cachePath, err
+}
+
+func (d *FileDownstream) PutWithContext(ctx context.Context, data *DSData) (string, error) {
+	select {
+	case <-ctx.Done():
+		log.Println(ctx.Err())
+	}
+
 	cachePath := filepath.Join(d.URI, data.Path)
 
 	log.Println("using ", cachePath)
