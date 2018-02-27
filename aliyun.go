@@ -2,10 +2,12 @@ package downstream
 
 import (
 	"bytes"
+	"context"
 	"errors"
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"log"
 	"path/filepath"
+
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
 type AliyunDownstream struct {
@@ -50,6 +52,10 @@ func (d *AliyunDownstream) Put(data *DSData) (string, error) {
 
 func (d *AliyunDownstream) Move(srcfile string, destfile string) (string, error) {
 	return "", errors.New("Not implemented yet")
+}
+
+func (d *AliyunDownstream) PutWithContext(ctx context.Context, data *DSData) (string, error) {
+	return "", errors.New("Aliyun sdk doesent support put with context")
 }
 
 func (d *AliyunDownstream) Info(path string) (string, error) {
