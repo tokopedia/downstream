@@ -25,11 +25,16 @@ const (
 	S3CacheHeader = "Cache-Control"
 )
 
-func NewS3Downstream(bucket string, path string, web string) *S3Downstream {
-	sess := session.New(&aws.Config{
+func NewS3Downstream(id, secret, bucket, path, web string) *S3Downstream {
+	awsConfig := &aws.Config{
 		Region: aws.String("ap-southeast-1"),
-		//DisableSSL: aws.Bool(true),
-	})
+	}
+
+	if id != "" && secret != "" {
+		awsConfig.WithCredentials(credentials.NewStaticCredentials(id, secret, ""))
+	}
+
+	sess := session.New(awsConfig)
 
 	svc := s3.New(sess)
 	if _, err := svc.HeadBucket(&s3.HeadBucketInput{Bucket: &bucket}); err != nil {
