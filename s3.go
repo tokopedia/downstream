@@ -21,18 +21,33 @@ type S3Downstream struct {
 	Web    string
 }
 
+type CredsConfig struct {
+	Type      string
+	AccessKey string
+	SecretKey string
+	Profile   string
+	Path      string
+}
+
 const (
 	S3InfoHeader  = "Size"
 	S3CacheHeader = "Cache-Control"
 )
 
-func NewS3Downstream(id, secret, bucket, path, web string) *S3Downstream {
+func NewS3Downstream(bucket, path, web string, credsConfig ...CredsConfig) *S3Downstream {
 	awsConfig := &aws.Config{
 		Region: aws.String("ap-southeast-1"),
 	}
 
-	if id != "" && secret != "" {
-		awsConfig.WithCredentials(credentials.NewStaticCredentials(id, secret, ""))
+	if len(credsConfig) > 0 {
+		creds := credsConfig[0]
+
+		switch creds.Type {
+		case "static":
+			awsConfig.WithCredentials(credentials.NewStaticCredentials(creds.AccessKey, creds.SecretKey, ""))
+		case "shared":
+			awsConfig.WithCredentials(credentials.NewSharedCredentials(creds.Path, creds.Profile))
+		}
 	}
 
 	sess := session.New(awsConfig)
