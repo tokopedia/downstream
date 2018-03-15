@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
+	awscreds "github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -21,33 +21,61 @@ type S3Downstream struct {
 	Web    string
 }
 
-type CredsConfig struct {
-	Type      string
-	AccessKey string
-	SecretKey string
-	Profile   string
-	Path      string
+type S3DownstreamConfig struct {
+	URI          string
+	Web          string
+	Type         string
+	AccessKey    string
+	SecretKey    string
+	Token        string
+	ProviderName string
+	Profile      string
+	Path         string
 }
 
+type CredsProvider awscreds.Provider
+
 const (
-	S3InfoHeader  = "Size"
-	S3CacheHeader = "Cache-Control"
+	S3InfoHeader     = "Size"
+	S3CacheHeader    = "Cache-Control"
+	DefaultCredsPath = "/root/.aws/credentials"
 )
 
-func NewS3Downstream(bucket, path, web string, credsConfig ...CredsConfig) *S3Downstream {
+func GenerateProvider(config *S3DownstreamConfig) CredsProvider {
+	var provider CredsProvider
+
+	switch config.Type {
+	case "static":
+		provider = &awscreds.StaticProvider{
+			Value: awscreds.Value{
+				AccessKeyID:     config.AccessKey,
+				SecretAccessKey: config.SecretKey,
+				SessionToken:    config.Token,
+				ProviderName:    config.ProviderName,
+			},
+		}
+	case "shared":
+		if config.Path == "" {
+			config.Path = DefaultCredsPath
+		}
+
+		provider = &awscreds.SharedCredentialsProvider{
+			Filename: config.Path,
+			Profile:  config.Profile,
+		}
+	}
+
+	return provider
+}
+
+func NewS3Downstream(bucket, path, web string, credsProvider ...CredsProvider) *S3Downstream {
 	awsConfig := &aws.Config{
 		Region: aws.String("ap-southeast-1"),
 	}
 
-	if len(credsConfig) > 0 {
-		creds := credsConfig[0]
-
-		switch creds.Type {
-		case "static":
-			awsConfig.WithCredentials(credentials.NewStaticCredentials(creds.AccessKey, creds.SecretKey, ""))
-		case "shared":
-			awsConfig.WithCredentials(credentials.NewSharedCredentials(creds.Path, creds.Profile))
-		}
+	if len(credsProvider) == 1 {
+		provider := credsProvider[0]
+		awsConfig.WithCredentials(awscreds.NewCredentials(provider))
 	}
 
 	sess := session.New(awsConfig)
