@@ -1,6 +1,7 @@
 package downstream
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
@@ -13,13 +14,13 @@ func TestAliyunDownstream(t *testing.T) {
 	if key == "" || secret == "" {
 		t.Error("ALIYUN_ACCESS_KEY_ID or ALIYUN_SECRET_ACCESS_KEY is not set")
 	}
-
 	ds := NewAliyunDownstream("tokopedia-upload", "video",
 		"https://tokopedia-upload.oss-ap-southeast-1.aliyuncs.com/video",
 		"oss-ap-southeast-1.aliyuncs.com",
 		key, secret)
 	t.Log(ds)
 	data := getData()
+	fmt.Println("path" + data.Path)
 	path, err := ds.Put(data)
 	if err != nil {
 		t.Error(err)
