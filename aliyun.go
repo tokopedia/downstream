@@ -53,7 +53,7 @@ func (d *AliyunDownstream) Put(data *DSData) (string, error) {
 	return data.Path, err
 }
 
-// Get Download file to oss
+// Get Download file from oss
 func (d *AliyunDownstream) Get(OssCachePath string, DownloadModelFilePath string) (string, error) {
 	err := d.b.GetObjectToFile(OssCachePath, DownloadModelFilePath)
 	return DownloadModelFilePath, err
@@ -69,7 +69,7 @@ func (d *AliyunDownstream) PutWithContext(ctx context.Context, data *DSData) (st
 	return "", errors.New("Aliyun sdk doesent support put with context")
 }
 
-// Info not get file info
+// Info get file info
 func (d *AliyunDownstream) Info(path string) (string, error) {
 	cachePath := filepath.Join(d.prefix, path)
 	exists, err := d.b.IsObjectExist(cachePath)
