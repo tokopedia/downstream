@@ -1,8 +1,6 @@
 package downstream
 
 import (
-
-	//      "bytes"
 	"bytes"
 	"context"
 	"errors"
@@ -22,7 +20,7 @@ type AliyunDownstream struct {
 }
 
 // NewAliyunDownstream Downstream constructor
-func NewAliyunDownstream(bucket string, prefix string, web string, endpoint string, key string, secret string) *AliyunDownstream {
+func NewAliyunDownstream(bucket string, path string, web string, endpoint string, key string, secret string) *AliyunDownstream {
 
 	client, err := oss.New(endpoint, key, secret)
 	if err != nil {
@@ -36,7 +34,7 @@ func NewAliyunDownstream(bucket string, prefix string, web string, endpoint stri
 
 	d := &AliyunDownstream{
 		client: client,
-		prefix: prefix,
+		prefix: path,
 		bucket: bucket,
 		Web:    web,
 		b:      b,
@@ -72,13 +70,13 @@ func (d *AliyunDownstream) PutWithContext(ctx context.Context, data *DSData) (st
 }
 
 // Info not get file info
-func (d *AliyunDownstream) Info(path string) error {
+func (d *AliyunDownstream) Info(path string) (string, error) {
 	cachePath := filepath.Join(d.prefix, path)
 	exists, err := d.b.IsObjectExist(cachePath)
 	if !exists {
 		err = errors.New("File not found")
 	}
-	return err
+	return "", err
 }
 
 // GetPublicURL get oss file url
