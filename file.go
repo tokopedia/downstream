@@ -2,6 +2,7 @@ package downstream
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/url"
 	"os"
@@ -10,11 +11,13 @@ import (
 	"strings"
 )
 
+//FileDownstream struct
 type FileDownstream struct {
 	URI string // this is the local path where images are saved
 	Web string // the webserver hostname via which those files will be accessed. used in GetPublicURL
 }
 
+//NewFileDownstream constructor
 func NewFileDownstream(path string, web string) *FileDownstream {
 	log.Println("Intialising file downstream with path ", path)
 
@@ -35,11 +38,13 @@ func (d *FileDownstream) String() string {
 	return "using filesystem to cache " + d.URI + " serving from: " + d.Web
 }
 
+//Info file info
 func (d *FileDownstream) Info(path string) (string, error) {
 	_, err := os.Stat(d.URI + path)
 	return "", err
 }
 
+//Put upload file
 func (d *FileDownstream) Put(data *DSData) (string, error) {
 	cachePath := filepath.Join(d.URI, data.Path)
 
@@ -64,6 +69,12 @@ func (d *FileDownstream) Put(data *DSData) (string, error) {
 	return cachePath, err
 }
 
+//Get Not implemented yet
+func (d *FileDownstream) Get(string, string) (string, error) {
+	return "", errors.New("Not implemented yet")
+}
+
+//PutWithContext Put With Context
 func (d *FileDownstream) PutWithContext(ctx context.Context, data *DSData) (string, error) {
 	select {
 	case <-ctx.Done():
@@ -93,10 +104,12 @@ func (d *FileDownstream) PutWithContext(ctx context.Context, data *DSData) (stri
 	return cachePath, err
 }
 
+// GetPublicURL get file path
 func (d *FileDownstream) GetPublicURL(path string) string {
 	return d.Web + "/" + path
 }
 
+// Move move file from source to dest
 func (d *FileDownstream) Move(src string, dest string) (string, error) {
 	log.Println("moving ", src, dest)
 	return "", nil
