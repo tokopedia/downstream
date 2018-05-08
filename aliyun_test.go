@@ -1,7 +1,6 @@
 package downstream
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -20,7 +19,6 @@ func TestAliyunDownstream(t *testing.T) {
 		key, secret)
 	t.Log(ds)
 	data := getData()
-	fmt.Println("path" + data.Path)
 	path, err := ds.Put(data)
 	if err != nil {
 		t.Error(err)

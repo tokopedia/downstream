@@ -3,13 +3,13 @@ package downstream
 import (
 
 	//      "bytes"
+	"bytes"
 	"context"
 	"errors"
 	"log"
 	"path/filepath"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/tokopedia/image-quality/src/constants"
 )
 
 // AliyunDownstream struct
@@ -49,15 +49,16 @@ func (d *AliyunDownstream) String() string {
 }
 
 // Put upload file to oss
-func (d *AliyunDownstream) Put() error {
-	err := d.b.UploadFile(constants.OssCachePath, constants.UploadModelFilePath, 100*1024)
-	return err
+func (d *AliyunDownstream) Put(data *DSData) (string, error) {
+	cachePath := filepath.Join(d.prefix, data.Path)
+	err := d.b.PutObject(cachePath, bytes.NewReader(data.Data))
+	return data.Path, err
 }
 
 // Get Download file to oss
-func (d *AliyunDownstream) Get() error {
-	err := d.b.GetObjectToFile(constants.OssCachePath, constants.DownloadModelFilePath)
-	return err
+func (d *AliyunDownstream) Get(OssCachePath string, DownloadModelFilePath string) (string, error) {
+	err := d.b.GetObjectToFile(OssCachePath, DownloadModelFilePath)
+	return DownloadModelFilePath, err
 }
 
 // Move not implemented
