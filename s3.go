@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"log"
+	"path/filepath"
+
 	"github.com/aws/aws-sdk-go/aws"
 	awscreds "github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"log"
-	"path/filepath"
 )
 
 type S3Downstream struct {
@@ -110,6 +111,11 @@ func (d *S3Downstream) Put(data *DSData) (string, error) {
 	}
 	_, err := d.client.Upload(upInput)
 	return data.Path, err
+}
+
+//Get Not implemented yet
+func (d *S3Downstream) Get(string, string) (string, error) {
+	return "", errors.New("Not implemented yet")
 }
 
 func (d *S3Downstream) PutWithContext(ctx context.Context, data *DSData) (string, error) {
