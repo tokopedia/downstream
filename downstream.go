@@ -19,4 +19,5 @@ type Downstream interface {
 	PutWithContext(context.Context, *DSData) (string, error)
 	Move(string, string) (string, error)
 	GetPublicURL(string) string
+	Delete(string) error
 }
