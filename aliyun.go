@@ -69,6 +69,11 @@ func (d *AliyunDownstream) PutWithContext(ctx context.Context, data *DSData) (st
 	return "", errors.New("Aliyun sdk doesent support put with context")
 }
 
+// Move not implemented
+func (d *AliyunDownstream) Delete(delfile string) (string, error) {
+	return "", errors.New("Not implemented yet")
+}
+
 // Info get file info
 func (d *AliyunDownstream) Info(path string) (string, error) {
 	cachePath := filepath.Join(d.prefix, path)
