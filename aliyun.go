@@ -70,8 +70,8 @@ func (d *AliyunDownstream) PutWithContext(ctx context.Context, data *DSData) (st
 }
 
 // Move not implemented
-func (d *AliyunDownstream) Delete(delfile string) (string, error) {
-	return "", errors.New("Not implemented yet")
+func (d *AliyunDownstream) Delete(delfile string) error {
+	return errors.New("Not implemented yet")
 }
 
 // Info get file info
