@@ -114,3 +114,9 @@ func (d *FileDownstream) Move(src string, dest string) (string, error) {
 	log.Println("moving ", src, dest)
 	return "", nil
 }
+
+// Delete file from source
+func (d *FileDownstream) Delete(src string) (string, error) {
+	log.Println("delete ", src)
+	return "", nil
+}
