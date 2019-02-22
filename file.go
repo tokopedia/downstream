@@ -122,6 +122,7 @@ func (d *FileDownstream) Delete(src string) error {
 }
 
 //GetObject Not implemented yet
-func (d *FileDownstream) GetObject(string) ([]byte, error) {
-	return nil, errors.New("Not implemented yet")
+func (d *FileDownstream) GetObject(OssFileName string) ([]byte, error) {
+	log.Println("GetObject ", OssFileName)
+	return nil, nil
 }
