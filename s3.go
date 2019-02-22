@@ -190,7 +190,7 @@ func (d *S3Downstream) GetPublicURL(path string) string {
 	return d.Web + "/" + path
 }
 
-//Get Not implemented yet
+//GetObject Not implemented yet
 func (d *S3Downstream) GetObject(string) ([]byte, error) {
 	return nil, errors.New("Not implemented yet")
 }

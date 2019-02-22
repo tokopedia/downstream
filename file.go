@@ -120,3 +120,8 @@ func (d *FileDownstream) Delete(src string) error {
 	log.Println("delete ", src)
 	return nil
 }
+
+//GetObject Not implemented yet
+func (d *FileDownstream) GetObject(string) ([]byte, error) {
+	return nil, errors.New("Not implemented yet")
+}
