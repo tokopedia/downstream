@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io/ioutil"
 	"log"
 	"path/filepath"
 
@@ -57,6 +58,24 @@ func (d *AliyunDownstream) Put(data *DSData) (string, error) {
 func (d *AliyunDownstream) Get(OssCachePath string, DownloadModelFilePath string) (string, error) {
 	err := d.b.GetObjectToFile(OssCachePath, DownloadModelFilePath)
 	return DownloadModelFilePath, err
+}
+
+// Get file from oss
+func (d *AliyunDownstream) GetObject(OssFileName string) ([]byte, error) {
+
+	// Download the object into ReadCloser(). The body needs to be closed
+	body, err := d.b.GetObject(OssFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	data, errBuffer := ioutil.ReadAll(body)
+	body.Close()
+	if errBuffer != nil {
+		return nil, errBuffer
+	}
+
+	return data, nil
 }
 
 // Move not implemented

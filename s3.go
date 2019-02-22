@@ -189,3 +189,9 @@ func (d *S3Downstream) Info(path string) (string, error) {
 func (d *S3Downstream) GetPublicURL(path string) string {
 	return d.Web + "/" + path
 }
+
+//GetObject Not implemented yet
+func (d *S3Downstream) GetObject(OssFileName string) ([]byte, error) {
+	log.Println("GetObject ", OssFileName)
+	return nil, errors.New("Not implemented yet")
+}

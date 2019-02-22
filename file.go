@@ -120,3 +120,9 @@ func (d *FileDownstream) Delete(src string) error {
 	log.Println("delete ", src)
 	return nil
 }
+
+//GetObject Not implemented yet
+func (d *FileDownstream) GetObject(OssFileName string) ([]byte, error) {
+	log.Println("GetObject ", OssFileName)
+	return nil, nil
+}
