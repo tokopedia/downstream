@@ -62,7 +62,7 @@ func (d *AliyunDownstream) Get(OssCachePath string, DownloadModelFilePath string
 
 // Get file from oss
 func (d *AliyunDownstream) GetObject(OssFileName string) ([]byte, error) {
-
+	cachePath := filepath.Join(d.prefix, OssFileName)
 	// Download the object into ReadCloser(). The body needs to be closed
 	body, err := d.b.GetObject(OssFileName)
 	if err != nil {
