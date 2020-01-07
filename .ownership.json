@@ -1,0 +1,15 @@
+{
+  "repository_name": "downstream",
+  "description": "Golang downstream package",
+  "security_owner": "bmishra",
+  "app": [
+    {
+      "name": "downstream",
+      "description": "Golang downstream package",
+      "owner": "bmishra",
+      "slack_channel": "",
+      "db": []
+    }
+  ]
+}
+
